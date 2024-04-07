@@ -1,0 +1,1 @@
+# Back end pour l'application de Gestion de Stock
