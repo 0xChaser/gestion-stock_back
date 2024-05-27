@@ -1,4 +1,12 @@
+# Python
+**/*.egg-info
 **/__pycache__/
 **/*.pyc
-**/*.egg-info/
+.venv/
+.env/
 
+# Dotenv files
+.env
+
+# Postgres
+pgdata/

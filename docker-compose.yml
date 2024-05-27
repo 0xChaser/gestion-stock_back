@@ -2,26 +2,27 @@ version: "3.4"
 
 services:
   postgresql:
-    image: postgres:14.2-alpine
+    image: postgres:latest
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password123
-      POSTGRES_DB: fastapi-db
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: e-stock
     ports:
       - "5432:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
 
-  postgresql-test:
-    image: postgres:14.2-alpine
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    ports: 
+      - "8888:80"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password123
-      POSTGRES_DB: db-test
-    ports:
-      - "5431:5432"
+      - PGADMIN_DEFAULT_EMAIL=test@test.com
+      - PGADMIN_DEFAULT_PASSWORD=decinablesprewad
     volumes:
-      - ./postgresql-test:/var/lib/postgresql/data
+      - pgadmin-data:/var/lib/pgadmin
 
   redis:
     image: redis:6.2.7
@@ -30,13 +31,6 @@ services:
     volumes:
       - redis:/data
 
-  rabbitmq:
-    image: rabbitmq:3.9.7
-    ports:
-      - "5672:5672"
-    environment:
-      - RABBITMQ_DEFAULT_USER=rabbit
-      - RABBITMQ_DEFAULT_PASS=password
-
 volumes:
   redis:
+  pgadmin-data:
