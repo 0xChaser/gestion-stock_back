@@ -1,7 +1,7 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 from e_stock.models.products import ProductCreate, Product, ProductPatch
 from e_stock.models.categories import Category
-from sqlalchemy import select
+from sqlmodel import select
 from e_stock.exceptions.products import ProductNotFound
 from uuid import UUID
 from sqlalchemy.orm import selectinload
