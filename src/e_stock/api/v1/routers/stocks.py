@@ -22,3 +22,8 @@ async def create_stock(stock: StockCreate, session: AsyncSession = Depends(get_d
 async def patch_stock(id: UUID, stock: StockPatch, session: AsyncSession = Depends(get_db_session)):
     stock_repo = StockRepository(session)
     return await stock_repo.patch(id, stock)
+
+@router.delete('/{id}', status_code=204)
+async def delete_stock(id: UUID, session: AsyncSession = Depends(get_db_session)):
+    stock_repo = StockRepository(session)
+    return await stock_repo.delete(id)

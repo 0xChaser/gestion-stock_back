@@ -15,13 +15,11 @@ class ProductRepository:
             query =  select(Product)
             result = await session.exec(query)
             response = result.scalars().all()
-            print(response)
             return response
     
     async def add(self, product: ProductCreate):
         async with self.session as session:
             new_product = Product.model_validate(product)
-            print(new_product)
             session.add(new_product)
             await session.commit()
             await session.refresh(new_product)
@@ -59,7 +57,7 @@ class ProductRepository:
             result = await session.exec(query)
             product = result.first()
             if product:
-                session.delete(product)
+                await session.delete(product)
                 await session.commit()
                 return True
             return False

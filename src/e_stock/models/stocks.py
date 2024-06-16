@@ -1,14 +1,24 @@
-from e_stock.core.database import Base
-from sqlalchemy import Column, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.types import Integer
-from sqlalchemy_utils import UUIDType
+from sqlmodel import SQLModel, Field, Relationship
 from uuid import UUID, uuid4
+from e_stock.models.products import ProductPublic, Product
+from e_stock.helpers.decorators import optional
 
-class Stock(Base):
+class StockBase(SQLModel):
+    quantity: int
+
+class Stock(StockBase, table=True):
     __tablename__ = "stocks"
-    
-    id: Mapped[UUID] = mapped_column(UUIDType(), primary_key=True, unique=True, nullable=False, default=uuid4)
-    quantity: Mapped[int] = mapped_column(Integer())
-    product_id: Mapped[UUID] = Column(UUIDType, ForeignKey('products.id'))
-    product: Mapped['Product'] = relationship('Product', back_populates="stock")
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    product_id: UUID = Field(foreign_key='products.id')
+    product: Product = Relationship(back_populates="stock", sa_relationship_kwargs={'lazy': "selectin"})
+
+class StockPublic(StockBase):
+    id: UUID
+    product: ProductPublic
+
+class StockCreate(StockBase):
+    product_id: UUID
+
+@optional()
+class StockPatch(StockBase):
+    pass

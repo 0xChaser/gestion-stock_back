@@ -43,7 +43,7 @@ class CategoryRepository:
         async with self.session as session:
             category = await session.get(Category, id)
             if category:
-                session.delete(category)
+                await session.delete(category)
                 await session.commit()
                 return True
             return False
