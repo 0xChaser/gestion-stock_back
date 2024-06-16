@@ -5,6 +5,8 @@ from e_stock.models.categories import CategoryBase, Category
 from e_stock.repositories.categories import CategoryRepository
 from e_stock.exceptions.categories import CategoryNotFound
 from uuid import UUID
+from e_stock.models.users import User
+from e_stock.core.security import current_active_user
 
 router = APIRouter(prefix="/category", tags=["category"])
 
@@ -27,11 +29,11 @@ async def create_category(category: CategoryBase, session: Session = Depends(get
     return await cat_repo.add(category)
 
 @router.patch('/{id}')
-async def update_category(id: UUID, category: CategoryBase, session: Session = Depends(get_db_session)):
+async def update_category(id: UUID, category: CategoryBase, session: Session = Depends(get_db_session), user: User = Depends(current_active_user)):
     cat_repo = CategoryRepository(session)
     return await cat_repo.patch(id, category)
 
 @router.delete('/{id}', status_code=204)
-async def delete_category(id: UUID, session: Session = Depends(get_db_session)):
+async def delete_category(id: UUID, session: Session = Depends(get_db_session), user: User = Depends(current_active_user)):
     cat_repo = CategoryRepository(session)
     return await cat_repo.delete(id)
