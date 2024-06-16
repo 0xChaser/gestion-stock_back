@@ -1,14 +1,14 @@
-from e_stock.core.database import Base
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.types import String
-from sqlalchemy_utils import UUIDType
-from e_stock.models.associations import product_category_association
-
+from sqlmodel import SQLModel, Field, Relationship
 from uuid import UUID, uuid4
+from e_stock.models.associations import ProductCategoriesLink
 
-class Category(Base):
+class CategoryBase(SQLModel):
+    name: str = Field(max_length=255, nullable=False)
+
+class Category(CategoryBase, table=True):
     __tablename__ = "categories"
-    
-    id: Mapped[UUID] = mapped_column(UUIDType(), primary_key=True, unique=True, nullable=False, default=uuid4)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    products: Mapped[list['Product']] = relationship('Product', secondary=product_category_association, back_populates='categories')
+    id: UUID = Field(default_factory=uuid4, primary_key=True, unique=True, nullable=False)
+    products: list["Product"] = Relationship(back_populates="categories", link_model=ProductCategoriesLink, sa_relationship_kwargs={"lazy": "selectin"})
+
+class CategoryPublic(CategoryBase):
+    id: UUID

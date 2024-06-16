@@ -1,0 +1,12 @@
+[Unit]
+Description=e-Stock API
+
+[Service]
+WorkingDirectory=/opt/estock
+ExecStart=/opt/estock/bin/fastapi run
+Restart=always
+User=estock
+Group=nogroup
+
+[Install]
+WantedBy=multi-user.service

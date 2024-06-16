@@ -1,7 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from e_stock.models.categories import Category
-from e_stock.schemas.categories import CategoryBase
+from e_stock.models.categories import Category, CategoryBase
 from uuid import UUID
 
 class CategoryRepository:
@@ -11,41 +10,40 @@ class CategoryRepository:
     async def list(self):
         async with self.session as session:
             query = select(Category)
-            result = await session.execute(query)
+            result = await session.exec(query)
             return result.scalars().all()
     
     async def get_by_id(self, id: UUID):
         async with self.session as session:
             query = select(Category).filter(Category.id == id)
-            result = await session.execute(query)
+            result = await session.exec(query)
             return result.scalars().first()
     
     async def add(self, category: CategoryBase):
         async with self.session as session:
-            new_category = Category(**category.model_dump())
+            new_category = Category.model_validate(category)
             session.add(new_category)
             await session.commit()
+            await session.refresh(new_category)
             return new_category
     
     async def update(self, id: UUID, category: CategoryBase):
         async with self.session as session:
-            query = select(Category).filter(Category.id == id)
-            result = await session.execute(query)
-            db_category = result.scalars().first()
+            db_category = await session.get(Category, id)
             if db_category:
-                for key, value in category.model_dump().items():
+                for key, value in category.model_dump(exclude_unset=True).items():
                     setattr(db_category, key, value)
-                await session.commit()
+                session.add(db_category)
+                session.commit()
+                session.refresh(db_category)
                 return db_category
             return None
     
     async def delete(self, id: UUID):
         async with self.session as session:
-            query = select(Category).filter(Category.id == id)
-            result = await session.execute(query)
-            category = result.scalars().first()
+            category = await session.get(Category, id)
             if category:
-                await session.delete(category)
+                session.delete(category)
                 await session.commit()
                 return True
             return False

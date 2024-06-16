@@ -1,15 +1,25 @@
-from e_stock.core.database import Base
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.types import String, Float
+from sqlmodel import SQLModel, Field, Relationship
 from uuid import UUID, uuid4
-from sqlalchemy_utils import UUIDType
-from e_stock.models.associations import product_category_association
+from e_stock.models.associations import ProductCategoriesLink
+from e_stock.models.categories import Category
+from e_stock.helpers.decorators import optional
 
-class Product(Base):
+class ProductBase(SQLModel):
+    name: str = Field(index=True)
+    price: float
+
+class Product(ProductBase, table=True):
     __tablename__ = "products"
-    
-    id: Mapped[UUID] = mapped_column(UUIDType(), primary_key=True, unique=True, nullable=False, default=uuid4)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    price: Mapped[float] = mapped_column(Float(), nullable=True)
-    categories: Mapped[list['Category']] = relationship('Category', secondary=product_category_association, back_populates='products')
-    stock: Mapped['Stock'] = relationship("Stock", back_populates='product', uselist=False)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    categories: list['Category'] = Relationship(back_populates="products", link_model=ProductCategoriesLink, sa_relationship_kwargs={"lazy": "selectin"})
+
+class ProductPublic(ProductBase):
+    id: UUID
+    categories: list[Category] = []
+
+class ProductCreate(ProductBase):
+    categories: list[Category] = []
+
+@optional()
+class ProductPatch(ProductCreate):
+    pass

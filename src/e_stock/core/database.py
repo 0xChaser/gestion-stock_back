@@ -1,22 +1,20 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
 from e_stock.core.config import settings
-from sqlalchemy.orm import declarative_base
+from sqlmodel import create_engine, SQLModel
+from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.ext.asyncio.engine import AsyncEngine
+from sqlalchemy.orm import sessionmaker
 
-engine = create_async_engine(
-    settings.db_url.__str__(),
-    echo=True,
-    future=True
-)
 
-Base = declarative_base()
+engine = AsyncEngine(create_engine(settings.db_url.__str__(), echo=True, future=True))
 
-async_session = sessionmaker(
-    engine,
-    expire_on_commit=False,
-    class_=AsyncSession
-)
+async def init_db():
+    async with engine.begin() as conn:
+        # await conn.run_sync(SQLModel.metadata.drop_all)
+        await conn.run_sync(SQLModel.metadata.create_all)
 
 async def get_db_session():
+    async_session = sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
     async with async_session() as session:
         yield session
