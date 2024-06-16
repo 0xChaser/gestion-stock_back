@@ -14,7 +14,7 @@ class ProductRepository:
         async with self.session as session:
             query =  select(Product)
             result = await session.exec(query)
-            response = result.scalars().all()
+            response = result.all()
             return response
     
     async def add(self, product: ProductCreate):
@@ -38,7 +38,7 @@ class ProductRepository:
         async with self.session as session:
             query = select(Product).options(selectinload(Product.categories)).where(Product.id == id)
             result = await session.exec(query)
-            db_product = result.scalars().first()
+            db_product = result.first()
             if db_product:
                 product_data = product.model_dump(exclude_unset=True)
                 for key, value in product_data.items():
