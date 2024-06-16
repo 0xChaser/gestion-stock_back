@@ -13,7 +13,7 @@ class UserRepository(UUIDIDMixin, BaseUserManager[User, UUID]):
 
     async def on_after_register(self, user: User, request: Request | None = None) -> None:
         print(f"User {user.id} has registered.")
-        return await super().on_after_register(user, request)()
+        return await super().on_after_register(user, request)
     
     async def on_after_forgot_password(self, user: User, token: str, request: Request | None = None) -> None:
         print(f"User {user.id} has forgot their password. Reset token: {token}")

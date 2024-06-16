@@ -4,7 +4,7 @@ from sqlmodel import create_engine, SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from sqlalchemy.orm import sessionmaker
-from fastapi_users_db_sqlmodel import SQLModelUserDatabase
+from fastapi_users_db_sqlmodel import SQLModelUserDatabaseAsync
 from e_stock.models.users import User
 
 
@@ -23,4 +23,4 @@ async def get_db_session():
         yield session
 
 async def get_user_db(session: AsyncSession = Depends(get_db_session)):
-    yield SQLModelUserDatabase(session, User)
+    yield SQLModelUserDatabaseAsync(session, User)

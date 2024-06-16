@@ -44,7 +44,7 @@ class CategoryRepository:
     async def delete(self, id: UUID):
         async with self.session as session:
             query = select(Category).where(Category.id == id)
-            result = session.exec(query)
+            result = await session.exec(query)
             category = result.first()
             if category:
                 await session.delete(category)

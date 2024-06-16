@@ -15,7 +15,7 @@ async def list_products(session: AsyncSession = Depends(get_db_session)):
 @router.get('/{id}', response_model=ProductPublic)
 async def get_product_by_id(id: UUID, session: AsyncSession = Depends(get_db_session)):
     prod_repo = ProductRepository(session)
-    return await prod_repo.get_by_id(id)
+    return ProductPublic.model_validate(await prod_repo.get_by_id(id))
 
 @router.post('/', response_model=ProductPublic)
 async def create_product(product: ProductCreate, session: AsyncSession = Depends(get_db_session)):
