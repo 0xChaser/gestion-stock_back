@@ -25,6 +25,15 @@ class ProductRepository:
             await session.refresh(new_product)
             return new_product
     
+    async def get_by_id(self, id: UUID):
+        async with self.session as session:
+            query = select(Product).options(selectinload(Product.categories)).where(Product.id == id)
+            result = await session.exec(query)
+            db_product = result.first()
+            if db_product:
+                return db_product
+            raise ProductNotFound(id)
+    
     async def patch(self, id: UUID, product: ProductPatch):
         async with self.session as session:
             query = select(Product).options(selectinload(Product.categories)).where(Product.id == id)

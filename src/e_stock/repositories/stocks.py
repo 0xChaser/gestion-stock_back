@@ -24,6 +24,15 @@ class StockRepository:
             await session.refresh(new_stock)
             return new_stock
     
+    async def get_by_id(self, id: UUID):
+        async with self.session as session:
+            query = select(Stock).options(selectinload(Stock.product)).where(Stock.id == id)
+            result = await session.exec(query)
+            db_stock = result.first()
+            if db_stock:
+                return db_stock
+            raise StockNotFound(id)
+    
     async def patch(self, id: UUID, stock: StockPatch):
         async with self.session as session:
             query = select(Stock).options(selectinload(Stock.product)).where(Stock.id == id)

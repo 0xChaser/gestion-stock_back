@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from e_stock.models.categories import Category, CategoryBase
 from uuid import UUID
@@ -11,13 +11,13 @@ class CategoryRepository:
         async with self.session as session:
             query = select(Category)
             result = await session.exec(query)
-            return result.scalars().all()
+            return result.all()
     
     async def get_by_id(self, id: UUID):
         async with self.session as session:
             query = select(Category).filter(Category.id == id)
             result = await session.exec(query)
-            return result.scalars().first()
+            return result.first()
     
     async def add(self, category: CategoryBase):
         async with self.session as session:
@@ -27,21 +27,25 @@ class CategoryRepository:
             await session.refresh(new_category)
             return new_category
     
-    async def update(self, id: UUID, category: CategoryBase):
+    async def patch(self, id: UUID, category: CategoryBase):
         async with self.session as session:
-            db_category = await session.get(Category, id)
+            query = select(Category).where(Category.id == id)
+            result = await session.exec(query)
+            db_category = result.first()
             if db_category:
                 for key, value in category.model_dump(exclude_unset=True).items():
                     setattr(db_category, key, value)
                 session.add(db_category)
-                session.commit()
-                session.refresh(db_category)
+                await session.commit()
+                await session.refresh(db_category)
                 return db_category
             return None
     
     async def delete(self, id: UUID):
         async with self.session as session:
-            category = await session.get(Category, id)
+            query = select(Category).where(Category.id == id)
+            result = session.exec(query)
+            category = result.first()
             if category:
                 await session.delete(category)
                 await session.commit()

@@ -13,6 +13,11 @@ async def list_stocks(session: AsyncSession = Depends(get_db_session)):
     stock_repo = StockRepository(session)
     return await stock_repo.list()
 
+@router.get('/{id}', response_model=StockPublic)
+async def get_by_id(id: UUID, session: AsyncSession = Depends(get_db_session)):
+    stock_repo = StockRepository(session)
+    return await stock_repo.get_by_id(id)
+
 @router.post('/', response_model=StockPublic)
 async def create_stock(stock: StockCreate, session: AsyncSession = Depends(get_db_session)):
     stock_repo = StockRepository(session)

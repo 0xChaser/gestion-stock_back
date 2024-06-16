@@ -29,7 +29,7 @@ async def create_category(category: CategoryBase, session: Session = Depends(get
 @router.patch('/{id}')
 async def update_category(id: UUID, category: CategoryBase, session: Session = Depends(get_db_session)):
     cat_repo = CategoryRepository(session)
-    return await cat_repo.update(id, category)
+    return await cat_repo.patch(id, category)
 
 @router.delete('/{id}', status_code=204)
 async def delete_category(id: UUID, session: Session = Depends(get_db_session)):
