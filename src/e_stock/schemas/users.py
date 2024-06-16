@@ -1,13 +1,11 @@
-from pydantic import BaseModel
+from fastapi_users.schemas import BaseUser, BaseUserCreate, BaseUserUpdate
 from uuid import UUID
 
-class UserBase(BaseModel):
-    id: UUID
-    username: str
-    is_admin: bool = False
+class UserRead(BaseUser[UUID]):
+    pass
 
-class UserInDB(UserBase):
-    hashed_password: str
+class UserCreate(BaseUserCreate):
+    pass
 
-class UserOut(UserBase):
+class UserUpdate(BaseUserUpdate):
     pass

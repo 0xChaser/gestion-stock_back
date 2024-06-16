@@ -4,8 +4,13 @@ from importlib.metadata import version
 from fastapi.middleware.cors import CORSMiddleware
 from e_stock.core.config import settings
 from e_stock.exceptions.base import register_handlers
-from sqlmodel import SQLModel
 from e_stock.core.database import init_db
+
+
+from fastapi import Depends
+from e_stock.models.users import User
+from e_stock.core.security import current_active_user
+
 
 
 app = FastAPI(
@@ -30,3 +35,8 @@ app.add_middleware(
 app.include_router(v1_router)
 
 register_handlers(app)
+
+@app.get('/protected')
+async def protected_route(user: User = Depends(current_active_user)):
+    return {"message": f"Hello {user.email} !", "user": user}
+
