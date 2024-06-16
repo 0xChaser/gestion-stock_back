@@ -5,7 +5,7 @@ from e_stock.repositories.products import ProductRepository
 from e_stock.models.products import ProductPublic, ProductCreate, ProductPatch
 from uuid import UUID
 
-router = APIRouter(prefix="/products", tags=["products"])
+router = APIRouter(prefix="/product", tags=["product"])
 
 @router.get('/', response_model=list[ProductPublic])
 async def list_products(session: AsyncSession = Depends(get_db_session)):
