@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel, Field, Relationship
 from uuid import UUID, uuid4
 from e_stock.models.associations import ProductCategoriesLink
-from e_stock.models.categories import Category
+from e_stock.models.categories import Category, CategoryPublic
 from e_stock.helpers.decorators import optional
 from typing import Optional
 
@@ -20,7 +20,7 @@ class ProductPublic(ProductBase):
     categories: list[Category] = []
 
 class ProductCreate(ProductBase):
-    categories: list[Category] = []
+    categories: list[CategoryPublic] = []
 
 @optional()
 class ProductPatch(ProductCreate):

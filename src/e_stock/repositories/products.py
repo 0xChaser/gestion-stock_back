@@ -19,15 +19,19 @@ class ProductRepository:
             return response
     
     async def add(self, product: ProductCreate):
-        async with self.session() as session:
+        async with self.session as session:
+            # Convertir les catégories publiques en catégories SQLAlchemy
+            categories_to_add = []
+            for category_public in product.categories:
+                existing_category = await session.get(Category, category_public.id)
+                if existing_category:
+                    categories_to_add.append(existing_category)
+                else:
+                    raise CategoryNotFound(category_public.id)
+            product.categories = categories_to_add
+
+            # Créer le produit en utilisant les catégories converties
             new_product = Product.model_validate(product)
-            
-            # Vérifier et ajouter les catégories si elles n'existent pas
-            if new_product.categories:
-                for category in new_product.categories:
-                    existing_category = await session.get(Category, category.id)
-                    if not existing_category:
-                        raise CategoryNotFound(category.id)
             
             session.add(new_product)
             await session.commit()
