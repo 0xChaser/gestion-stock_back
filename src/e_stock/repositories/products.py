@@ -3,6 +3,7 @@ from e_stock.models.products import ProductCreate, Product, ProductPatch
 from e_stock.models.categories import Category
 from sqlmodel import select
 from e_stock.exceptions.products import ProductNotFound
+from e_stock.exceptions.categories import CategoryNotFound
 from uuid import UUID
 from sqlalchemy.orm import selectinload
 
@@ -18,8 +19,16 @@ class ProductRepository:
             return response
     
     async def add(self, product: ProductCreate):
-        async with self.session as session:
+        async with self.session() as session:
             new_product = Product.model_validate(product)
+            
+            # Vérifier et ajouter les catégories si elles n'existent pas
+            if new_product.categories:
+                for category in new_product.categories:
+                    existing_category = await session.get(Category, category.id)
+                    if not existing_category:
+                        raise CategoryNotFound(category.id)
+            
             session.add(new_product)
             await session.commit()
             await session.refresh(new_product)
