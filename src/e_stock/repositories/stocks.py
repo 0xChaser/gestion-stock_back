@@ -1,20 +1,23 @@
+from uuid import UUID
+
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
-from e_stock.models.stocks import Stock, StockCreate, StockPatch
-from sqlalchemy.orm import selectinload
-from uuid import UUID
+
 from e_stock.exceptions.stocks import StockNotFound
+from e_stock.models.stocks import Stock, StockCreate, StockPatch
+
 
 class StockRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
-    
+
     async def list(self):
         async with self.session as session:
             query = select(Stock)
             result = await session.exec(query)
             return result.all()
-    
+
     async def add(self, stock: StockCreate):
         async with self.session as session:
             new_stock = Stock.model_validate(stock)
@@ -23,7 +26,7 @@ class StockRepository:
             await session.commit()
             await session.refresh(new_stock)
             return new_stock
-    
+
     async def get_by_id(self, id: UUID):
         async with self.session as session:
             query = select(Stock).options(selectinload(Stock.product)).where(Stock.id == id)
@@ -32,7 +35,7 @@ class StockRepository:
             if db_stock:
                 return db_stock
             raise StockNotFound(id)
-    
+
     async def patch(self, id: UUID, stock: StockPatch):
         async with self.session as session:
             query = select(Stock).options(selectinload(Stock.product)).where(Stock.id == id)

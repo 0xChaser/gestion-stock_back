@@ -1,5 +1,7 @@
-from e_stock.exceptions.base import NotFound
 from uuid import UUID
+
+from e_stock.exceptions.base import NotFound
+
 
 class ProductNotFound(NotFound):
     def __init__(self, id: UUID):

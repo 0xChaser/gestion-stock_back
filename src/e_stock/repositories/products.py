@@ -1,11 +1,14 @@
-from sqlmodel.ext.asyncio.session import AsyncSession
-from e_stock.models.products import ProductCreate, Product, ProductPatch
-from e_stock.models.categories import Category
-from sqlmodel import select
-from e_stock.exceptions.products import ProductNotFound
-from e_stock.exceptions.categories import CategoryNotFound
 from uuid import UUID
+
 from sqlalchemy.orm import selectinload
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
+
+from e_stock.exceptions.categories import CategoryNotFound
+from e_stock.exceptions.products import ProductNotFound
+from e_stock.models.categories import Category
+from e_stock.models.products import Product, ProductCreate, ProductPatch
+
 
 class ProductRepository:
     def __init__(self, session: AsyncSession):
@@ -13,11 +16,11 @@ class ProductRepository:
 
     async def list(self):
         async with self.session as session:
-            query =  select(Product)
+            query = select(Product)
             result = await session.exec(query)
             response = result.all()
             return response
-    
+
     async def add(self, product: ProductCreate):
         async with self.session as session:
             # Convertir les catégories publiques en catégories SQLAlchemy
@@ -32,12 +35,12 @@ class ProductRepository:
 
             # Créer le produit en utilisant les catégories converties
             new_product = Product.model_validate(product)
-            
+
             session.add(new_product)
             await session.commit()
             await session.refresh(new_product)
             return new_product
-    
+
     async def get_by_id(self, id: UUID):
         async with self.session as session:
             query = select(Product).options(selectinload(Product.categories)).where(Product.id == id)
@@ -46,7 +49,7 @@ class ProductRepository:
             if db_product:
                 return db_product
             raise ProductNotFound(id)
-    
+
     async def patch(self, id: UUID, product: ProductPatch):
         async with self.session as session:
             query = select(Product).options(selectinload(Product.categories)).where(Product.id == id)
@@ -72,7 +75,7 @@ class ProductRepository:
                 await session.refresh(db_product)
                 return db_product
             raise ProductNotFound(id)
-    
+
     async def delete(self, id: UUID):
         async with self.session as session:
             query = select(Product).where(Product.id == id)

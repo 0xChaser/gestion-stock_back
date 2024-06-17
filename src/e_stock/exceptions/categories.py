@@ -1,5 +1,7 @@
-from e_stock.exceptions.base import NotFound
 from uuid import UUID
+
+from e_stock.exceptions.base import NotFound
+
 
 class CategoryNotFound(NotFound):
     def __init__(self, id: UUID):

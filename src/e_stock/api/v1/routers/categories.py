@@ -1,21 +1,25 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
+
 from e_stock.core.database import get_db_session
-from e_stock.models.categories import CategoryBase, Category
-from e_stock.repositories.categories import CategoryRepository
-from e_stock.exceptions.categories import CategoryNotFound
-from uuid import UUID
-from e_stock.models.users import User
 from e_stock.core.security import current_active_user
+from e_stock.exceptions.categories import CategoryNotFound
+from e_stock.models.categories import Category, CategoryBase
+from e_stock.models.users import User
+from e_stock.repositories.categories import CategoryRepository
 
 router = APIRouter(prefix="/category", tags=["category"])
 
-@router.get('/')
+
+@router.get("/")
 async def list_categories(session: Session = Depends(get_db_session)):
     cat_repo = CategoryRepository(session)
     return await cat_repo.list()
 
-@router.get('/{id}')
+
+@router.get("/{id}")
 async def get_category_by_id(id: UUID, session: Session = Depends(get_db_session)):
     cat_repo = CategoryRepository(session)
     result = await cat_repo.get_by_id(id)
@@ -23,17 +27,27 @@ async def get_category_by_id(id: UUID, session: Session = Depends(get_db_session
         return result
     raise CategoryNotFound(id)
 
-@router.post('/', response_model=Category)
+
+@router.post("/", response_model=Category)
 async def create_category(category: CategoryBase, session: Session = Depends(get_db_session)):
     cat_repo = CategoryRepository(session)
     return await cat_repo.add(category)
 
-@router.patch('/{id}')
-async def update_category(id: UUID, category: CategoryBase, session: Session = Depends(get_db_session), user: User = Depends(current_active_user)):
+
+@router.patch("/{id}")
+async def update_category(
+    id: UUID,
+    category: CategoryBase,
+    session: Session = Depends(get_db_session),
+    user: User = Depends(current_active_user),
+):
     cat_repo = CategoryRepository(session)
     return await cat_repo.patch(id, category)
 
-@router.delete('/{id}', status_code=204)
-async def delete_category(id: UUID, session: Session = Depends(get_db_session), user: User = Depends(current_active_user)):
+
+@router.delete("/{id}", status_code=204)
+async def delete_category(
+    id: UUID, session: Session = Depends(get_db_session), user: User = Depends(current_active_user)
+):
     cat_repo = CategoryRepository(session)
     return await cat_repo.delete(id)

@@ -1,10 +1,12 @@
 from copy import deepcopy
-from sqlmodel import SQLModel
+from typing import Any, Callable, Optional, Type, TypeVar
+
 from pydantic import BaseModel, create_model
 from pydantic.fields import FieldInfo
-from typing import Any, Optional, Callable, TypeVar, Type
+from sqlmodel import SQLModel
 
 Model = TypeVar("Model", bound=Type[BaseModel])
+
 
 def optional(without_fields: list[str] | None = None) -> Callable[[Model], Model]:
     """A decorator that create a partial model.
@@ -21,9 +23,7 @@ def optional(without_fields: list[str] | None = None) -> Callable[[Model], Model
     def wrapper(model: Type[Model]) -> Type[Model]:
         base_model: Type[Model] = model
 
-        def make_field_optional(
-            field: FieldInfo, default: Any = None
-        ) -> tuple[Any, FieldInfo]:
+        def make_field_optional(field: FieldInfo, default: Any = None) -> tuple[Any, FieldInfo]:
             new = deepcopy(field)
             new.default = default
             new.annotation = Optional[field.annotation]
