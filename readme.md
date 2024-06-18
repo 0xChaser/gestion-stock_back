@@ -27,9 +27,14 @@ possibilité de gérer les utilisateurs, les produits, les catégories et le sto
 - JSON
 - FastAPI
 
-L'api est hébergée sur un VPS, la doc de l'API est disponible à : 
+La base de données est gérée par Supabase :
+
+
+L'api est hébergée sur un VPS à l'adresse IP suivante : `85.215.163.79`
+La documentation de l'API est disponible à : 
 
 https://e-stock.flo-isk.fr/docs
+
 
 # Front-End
 
