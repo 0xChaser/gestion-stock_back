@@ -27,7 +27,7 @@ possibilité de gérer les utilisateurs, les produits, les catégories et le sto
 - JSON
 - FastAPI
 
-La base de données est gérée par Supabase :
+La base de données est gérée par Supabase, c'est une `PostgreSQL`
 
 
 L'api est hébergée sur un VPS à l'adresse IP suivante : `85.215.163.79`
